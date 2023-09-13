@@ -3,31 +3,27 @@ package com.example.msstudent.service.impl;
 import com.example.msstudent.model.Student;
 import com.example.msstudent.repository.StudentRepository;
 import com.example.msstudent.service.StudentService;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
+@AllArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
-    private final StudentRepository studentRepository;
+private StudentRepository studentRepository;
 
-    public StudentServiceImpl(StudentRepository studentRepository) {
-        this.studentRepository = studentRepository;
+    @Override
+    public Mono<Object> setStudent(Student student) {
+        return studentRepository.findById(student.getId())
+                .flatMap(existingStudent -> Mono.error(new RuntimeException("El ID ya existe, no se puede realizar la grabación.")))
+                .onErrorResume(error -> Mono.just(error.getMessage()))
+                .switchIfEmpty(studentRepository.save(student).thenReturn("Estudiante grabado exitosamente"));
     }
 
     @Override
-    public String setStudent(Student student) {
-        if(student.getEdad() <80) {
-            studentRepository.save(student);
-        }else{
-            return "No cumple la edad ";
-        }
-    return "se grabo con exito";
-    }
-
-    @Override
-    public List<Student> studentList() {
+    public Flux<Student> studentList() {
         return studentRepository.findAllByEstado(true);
 
     }

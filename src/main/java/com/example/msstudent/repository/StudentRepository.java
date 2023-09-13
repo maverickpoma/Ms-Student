@@ -1,16 +1,25 @@
 package com.example.msstudent.repository;
 
 import com.example.msstudent.model.Student;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public interface StudentRepository extends JpaRepository<Student,Long> {
+@Component
+public interface StudentRepository{
 
-        Student save(Student student);
-        List<Student> findAllByEstado(boolean estado);
-        Optional<Student> findById(Long id);
+        Flux<Student> findAll();
+
+        Mono<Student> findById(Long id);
+
+        Mono<Student> save(Student student);
+
+        Flux<Student> findAllByEstado(boolean estado);
 }
 
